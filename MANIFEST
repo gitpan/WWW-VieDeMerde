@@ -1,0 +1,16 @@
+Changes
+doc/documentation.html
+examples/last.pl
+lib/WWW/VieDeMerde.pm
+lib/WWW/VieDeMerde/Message.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/boilerplate.t
+t/message.t
+t/methods.t
+t/new.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
