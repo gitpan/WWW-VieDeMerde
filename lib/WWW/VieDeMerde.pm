@@ -10,17 +10,19 @@ use XML::Twig;
 
 use WWW::VieDeMerde::Message;
 
+=encoding utf8
+
 =head1 NAME
 
-WWW::VieDeMerde - A perl module for using the viedemerde.fr API
+WWW::VieDeMerde - A perl module to use the viedemerde.fr API
 
 =head1 VERSION
 
-Version 0.01
+Version 0.011
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.011';
 
 =head1 SYNOPSIS
 
@@ -36,11 +38,11 @@ our $VERSION = '0.01';
 =head1 DESCRIPTION
 
 viedemerde.fr is a french microblog where people post short
-messages in order to show how their life is crappy. It comes with a
-simple but efficient http-based API. Since the webiste is only in
-french, this module will probably be useful only for french speaker Perl
-programmers and the most of this documentation will be written in
-french.
+messages in order to show how their life is crappy. It presents a
+simple but efficient http-based API. Since the website is only in
+French, this module will probably be useful only for French speaker Perl
+programmers and most of this documentation will be written in
+French.
 
 Ce module essaye de fournir une interface complète pour l'API 1.2, telle
 que documentée ici L<http://www.viedemerde.fr/api/documentation>.

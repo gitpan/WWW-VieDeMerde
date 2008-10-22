@@ -2,10 +2,11 @@ package WWW::VieDeMerde::Message;
 
 use warnings;
 use strict;
-use Data::Dump qw/dump/;
 use Carp;
 
 use XML::Twig;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -13,11 +14,11 @@ WWW::VieDeMerde::Message - A message from VieDeMerde.fr
 
 =head1 VERSION
 
-Version 0.01
+Version 0.011
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.011';
 
 =head1 SYNOPSIS
 
@@ -30,7 +31,7 @@ our $VERSION = '0.01';
 
 =head1 DESCRIPTION
 
-You should read first the documentation L<WWW::VieDeMerde> !
+You should first read the documentation L<WWW::VieDeMerde> !
 
 Vous devriez commencer par lire la documentation de L<WWW::VieDeMerde> !
 

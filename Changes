@@ -1,5 +1,10 @@
 Revision history for WWW-VieDeMerde
 
+0.011   Sun Oct 19 12:46:40 CEST 2008
+        Added =encoding utf8 in pod. Sorry.
+		Corrected some English mistakes.
+		Removed Data::Dump dependency.
+
 0.01    Sat Oct 18 16:58:01 CEST 2008
         First version
 
