@@ -1,5 +1,9 @@
 Revision history for WWW-VieDeMerde
 
+0.012   Thu Oct 23 17:27:26 CEST 2008
+		Added LICENCE field in Makefile.PL.
+		A suggestion of Gabor Szabo.
+
 0.011   Sun Oct 19 12:46:40 CEST 2008
         Added =encoding utf8 in pod. Sorry.
 		Corrected some English mistakes.

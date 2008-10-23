@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'WWW::VieDeMerde',
     AUTHOR              => 'Olivier Schwander <olivier.schwander@ens-lyon.org>',
+    LICENSE             => 'perl',
     VERSION_FROM        => 'lib/WWW/VieDeMerde.pm',
     ABSTRACT_FROM       => 'lib/WWW/VieDeMerde.pm',
     PL_FILES            => {},
@@ -16,3 +17,4 @@ WriteMakefile(
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'WWW-VieDeMerde-*' },
 );
+
