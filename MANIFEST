@@ -1,6 +1,8 @@
 Changes
 doc/documentation.html
+examples/categories.pl
 examples/last.pl
+examples/random.pl
 lib/WWW/VieDeMerde.pm
 lib/WWW/VieDeMerde/Message.pm
 Makefile.PL

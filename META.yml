@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                WWW-VieDeMerde
-version:             0.012
+version:             0.02
 abstract:            A perl module to use the viedemerde.fr API
 license:             perl
 author:              

@@ -18,11 +18,11 @@ WWW::VieDeMerde - A perl module to use the viedemerde.fr API
 
 =head1 VERSION
 
-Version 0.012
+Version 0.02
 
 =cut
 
-our $VERSION = '0.012';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -125,12 +125,7 @@ sub page {
 
     my $t = $self->{twig};
 
-    my $cmd = "view/last";
-    if (defined $page) {
-        $cmd .= "/$page";
-    }
-
-    my $xml = $self->run($cmd);
+    my $xml = $self->run("view", "last", $page);
     if (parse($xml, $t)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
@@ -140,7 +135,7 @@ sub page {
 
 =head2 last
 
-C<< $vdm->last() >> est un alias pour C<< $vdm->page(0) >>
+C<< $vdm->last >> est un alias pour C<< $vdm->page >>
 
 =cut
 
@@ -149,6 +144,224 @@ sub last {
     my $page = shift;
 
     return $self->page();
+}
+
+=head2 random
+
+C<< $vdm->page() >> renvoie une entrée aléatoire.
+
+=cut
+
+sub random {
+    my $self = shift;
+
+    my $t = $self->{twig};
+
+    my $xml = $self->run("view", "random");
+    if (parse($xml, $t)) {
+        my @l = WWW::VieDeMerde::Message->parse($t);
+        return $l[0];
+    }
+    return undef;
+}
+
+=head2 top
+
+C<< $vdm->top() >> renvoie le top global.
+
+Accepte un numéro de page en argument.
+
+=cut
+
+sub top {
+    my $self = shift;
+    my $page = shift;
+
+    my $t = $self->{twig};
+
+    my $xml = $self->run("view", "top", $page);
+    if (parse($xml, $t)) {
+        my @result = WWW::VieDeMerde::Message->parse($t);
+        return @result;
+    }
+    return undef;
+}
+
+=head2 top_jour
+
+C<< $vdm->top_jour() >> renvoie le top du jour.
+
+Accepte un numéro de page en argument.
+
+=cut
+
+sub top_jour {
+    my $self = shift;
+    my $page = shift;
+
+    my $t = $self->{twig};
+
+    my $xml = $self->run("view", "top_jour", $page);
+    if (parse($xml, $t)) {
+        my @result = WWW::VieDeMerde::Message->parse($t);
+        return @result;
+    }
+    return undef;
+}
+
+=head2 top_semaine
+
+C<< $vdm->top_semaine() >> renvoie le top de la semaine.
+
+Accepte un numéro de page en argument.
+
+=cut
+
+sub top_semaine {
+    my $self = shift;
+    my $page = shift;
+
+    my $t = $self->{twig};
+
+    my $xml = $self->run("view", "top_semaine", $page);
+    if (parse($xml, $t)) {
+        my @result = WWW::VieDeMerde::Message->parse($t);
+        return @result;
+    }
+    return undef;
+}
+
+=head2 top_mois
+
+C<< $vdm->top_mois() >> renvoie le top du mois.
+
+Accepte un numéro de page en argument.
+
+=cut
+
+sub top_mois {
+    my $self = shift;
+    my $page = shift;
+
+    my $t = $self->{twig};
+
+    my $xml = $self->run("view", "top_mois", $page);
+    if (parse($xml, $t)) {
+        my @result = WWW::VieDeMerde::Message->parse($t);
+        return @result;
+    }
+    return undef;
+}
+
+=head2 flop
+
+C<< $vdm->flop() >> renvoie le flop global.
+
+Accepte un numéro de page en argument.
+
+=cut
+
+sub flop {
+    my $self = shift;
+    my $page = shift;
+
+    my $t = $self->{twig};
+
+    my $xml = $self->run("view", "flop", $page);
+    if (parse($xml, $t)) {
+        my @result = WWW::VieDeMerde::Message->parse($t);
+        return @result;
+    }
+    return undef;
+}
+
+=head2 flop_jour
+
+C<< $vdm->flop_jour() >> renvoie le flop du jour.
+
+Accepte un numéro de page en argument.
+
+=cut
+
+sub flop_jour {
+    my $self = shift;
+    my $page = shift;
+
+    my $t = $self->{twig};
+
+    my $xml = $self->run("view", "flop_jour", $page);
+    if (parse($xml, $t)) {
+        my @result = WWW::VieDeMerde::Message->parse($t);
+        return @result;
+    }
+    return undef;
+}
+
+=head2 flop_semaine
+
+C<< $vdm->flop_semaine() >> renvoie le flop de la semaine.
+
+Accepte un numéro de page en argument.
+
+=cut
+
+sub flop_semaine {
+    my $self = shift;
+    my $page = shift;
+
+    my $t = $self->{twig};
+
+    my $xml = $self->run("view", "flop_semaine", $page);
+    if (parse($xml, $t)) {
+        my @result = WWW::VieDeMerde::Message->parse($t);
+        return @result;
+    }
+    return undef;
+}
+
+=head2 flop_mois
+
+C<< $vdm->flop_mois() >> renvoie le flop du mois.
+
+Accepte un numéro de page en argument.
+
+=cut
+
+sub flop_mois {
+    my $self = shift;
+    my $page = shift;
+
+    my $t = $self->{twig};
+
+    my $xml = $self->run("view", "flop_mois", $page);
+    if (parse($xml, $t)) {
+        my @result = WWW::VieDeMerde::Message->parse($t);
+        return @result;
+    }
+    return undef;
+}
+
+=head2 cat
+
+C<< $vdm->cat($cat) >> renvoie les dernières entrées de la catégorie C<$cat>.
+
+Accepte un numéro de page en argument.
+
+=cut
+
+sub cat {
+    my $self = shift;
+    my $cat = shift;
+    my $page = shift;
+
+    my $t = $self->{twig};
+
+    my $xml = $self->run("view", $cat, $page);
+    if (parse($xml, $t)) {
+        my @result = WWW::VieDeMerde::Message->parse($t);
+        return @result;
+    }
+    return undef;
 }
 
 =head1 INTERNAL METHODS AND FUNCTIONS
@@ -161,7 +374,7 @@ Rien de de tout ceci n'est destiné aux utilisateurs !
 
 sub run {
     my $self = shift;
-    my $command = shift;
+    my @commands = grep {defined $_} @_;
 
     my $token = $self->{token};
     my $key = $self->{key};
@@ -169,7 +382,7 @@ sub run {
 
     my $ua = $self->{ua};
 
-    my $cmd = "$url/$command";
+    my $cmd = $url . "/" . join("/", @commands);
     if (defined $key) {
         $cmd .= "?key=$key";
     }
