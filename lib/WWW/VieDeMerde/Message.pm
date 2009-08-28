@@ -14,11 +14,11 @@ WWW::VieDeMerde::Message - A message from VieDeMerde.fr
 
 =head1 VERSION
 
-Version 0.011
+Version 0.031
 
 =cut
 
-our $VERSION = '0.011';
+our $VERSION = '0.031';
 
 =head1 SYNOPSIS
 
@@ -33,35 +33,31 @@ our $VERSION = '0.011';
 
 You should first read the documentation L<WWW::VieDeMerde> !
 
-Vous devriez commencer par lire la documentation de L<WWW::VieDeMerde> !
+A WWW::VieDeMerde::Message object describes a fmylife or viedemerde entry. You probably do not need to create yourself such object, L<WWW::VieDeMerde> manage it.
 
-Un objet de la classe WWW::VieDeMerde::Message décrit une viedemerde.
-Normalement, vous ne devriez pas avoir à créer vous-même un tel objet,
-L<WWW::VieDeMerde> s'en charge.
-
-Seuls les accesseurs suivants sont utiles :
+The following accessors are useful:
 
 =over 4
 
 =item * id
 
-=item * auteur
+=item * author
 
-=item * categorie
+=item * category
 
 =item * date
 
-=item * je_valide
+=item * agree
 
-=item * bien_merite
+=item * deserved
 
-=item * commentaires
+=item * comments
 
-Indique le nombre de commentaires
+It's the number of commentaries
 
-=item * texte
+=item * text
 
-=item * commentable
+=item * comments_flag
 
 =back
 
@@ -69,8 +65,7 @@ Indique le nombre de commentaires
 
 =head2 new
 
-Crée un nouveau WWW::VieDeMerde::Message à partir d'un nœud vdm de
-l'arbre xml
+Create a new WWW::VieDeMerde::Message given a vdm node the xml response to a query.
 
 =cut
 
@@ -93,7 +88,7 @@ sub new {
 
 =head2 parse
 
-Prend un arbre xml et renvoie la listes des WWW::VieDeMerde::Message
+Take an xml tree and return a list of WWW::VieDeMerde::Message.
 qu'il contient.
 
 =cut
@@ -105,8 +100,9 @@ sub parse {
     my $t     = shift;
 
     my $root = $t->root;
-    my $vdms = $root->first_child('vdms');
-    my @vdm = $vdms->children('vdm');
+    my $vdms = $root->first_child('items');
+
+    my @vdm = $vdms->children('item');
 
     my @result = ();
 
@@ -122,8 +118,8 @@ sub parse {
 }
 
 # read-only accessors
-for my $attr (qw(id auteur categorie date je_valide bien_merite
-                 commentaires texte commentable )) {
+for my $attr (qw(id author category date agree deserved
+                 comments comments_flag text )) {
     no strict 'refs';
     *{"WWW::VieDeMerde::Message::$attr"} = sub { $_[0]{$attr} }
 }

@@ -5,5 +5,6 @@ use WWW::VieDeMerde;
 my $vdm = WWW::VieDeMerde->new();
 
 my $r = $vdm->random();
-print $r->texte, "\n\n";
+print $r->text, "\n";
+print $r->id, "\n";
 

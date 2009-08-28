@@ -18,11 +18,11 @@ WWW::VieDeMerde - A perl module to use the viedemerde.fr API
 
 =head1 VERSION
 
-Version 0.02
+Version 0.031
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.031';
 
 =head1 SYNOPSIS
 
@@ -33,48 +33,43 @@ our $VERSION = '0.02';
     my $tata = $toto->page(17);
     my $tata = $toto->random();
     
-    print $tata->texte, $tata->auteur;
+    print $tata->text, $tata->author;
 
 =head1 DESCRIPTION
 
-viedemerde.fr is a french microblog where people post short
-messages in order to show how their life is crappy. It presents a
-simple but efficient http-based API. Since the website is only in
-French, this module will probably be useful only for French speaker Perl
-programmers and most of this documentation will be written in
-French.
+viedemerde.fr and fmylife.com are microblogs where people post short
+messages in order to show how their life is crappy. It offers a simple
+but efficient http-based API.
 
-Ce module essaye de fournir une interface complète pour l'API 1.2, telle
-que documentée ici L<http://www.viedemerde.fr/api/documentation>.
+This module aims to implement a full interface for the version 2.0 of
+the API. The full documentation is here:
+L<http://dev.betacie.com/viewtopic.php?id=6>.
 
 =head1 METHODS
 
 =head2 new
 
-Cette fonction crée un nouvel objet WWW::VieDeMerde utilisable pour
-dialoguer avec le serveur.
+Creates a new WWW::VieDeMerde object.
 
-Les paramètres sont :
+Parameters are:
 
 =over 4
 
 =item * key
 
-Votre clé développeur. La valeur par défaut ("readonly") est suffisante
-pour toutes les fonctions qui ne tentent pas d'écrire dans la base de
-données. Vous pouvez demander une clé à l'adresse suivante
-L<http://www.viedemerde.fr/api/developpeurs>.
+Your developper key. The defaults value ("readonly") is sufficient for
+readonly functions. You can ask for a key here:
+L<http://www.viedemerde.fr/api/developpeurs> or L<http://www.fmylife.com/api/developers>.
 
 =item * token
 
-La clé d'identification pour se connecter à un compte utilisateur. Voir
-l'explication ici L<http://www.viedemerde.fr/api/documentation#ident>.
+The authentification to use an user account. See the API doc.
+
+Not sure it will works.
 
 =item * url
 
-L'URL utilisée pour parler au serveur. La seule valeur intéressante est
-L<http://sandbox.viedemerde.fr/1.2/> au lieu de
-L<http://api.viedemerde.fr/1.2/>.
+The URL of the API server. Do not change it, the defaults value ("api.betacie.com") is good enough.
 
 =back
 
@@ -85,11 +80,12 @@ sub new {
     my %params = @_;
 
     my %defaults = (
-                    key => "readonly",
-                    token => undef,
-                    url => "http://api.viedemerde.fr/1.2/",
-                    autoerrors => 0,
-                    );
+        key => "readonly",
+        token => undef,
+        url => "http://api.betacie.com",
+        autoerrors => 0,
+        lang => 'fr',
+        );
 
     my $self = {};
     bless($self, $class);
@@ -111,11 +107,11 @@ sub new {
 
 =head2 page
 
-C<< $vdm->page() >> renvoie la liste des 15 dernières entrées.
+C<< $vdm->page() >> returns the last 15 entries.
 
-C<< $vdm->page($n) >> la page $n (0 étant la plus récente).
+C<< $vdm->page($n) >> the $n page (0 is the last one).
 
-Renvoie la liste vide si la page demandée est vide.
+If the page you ask is empty, returns an empty list.
 
 =cut
 
@@ -126,6 +122,7 @@ sub page {
     my $t = $self->{twig};
 
     my $xml = $self->run("view", "last", $page);
+
     if (parse($xml, $t)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
@@ -135,20 +132,19 @@ sub page {
 
 =head2 last
 
-C<< $vdm->last >> est un alias pour C<< $vdm->page >>
+C<< $vdm->last >> alias for C<< $vdm->page >>.
 
 =cut
 
 sub last {
     my $self = shift;
-    my $page = shift;
 
     return $self->page();
 }
 
 =head2 random
 
-C<< $vdm->page() >> renvoie une entrée aléatoire.
+C<< $vdm->random() >> returns a random entry.
 
 =cut
 
@@ -167,9 +163,10 @@ sub random {
 
 =head2 top
 
-C<< $vdm->top() >> renvoie le top global.
+C<< $vdm->top() >> returns the 15 better ranked entries.
 
-Accepte un numéro de page en argument.
+This function and all the top_* and flop_* functions accept a page
+number as argument.
 
 =cut
 
@@ -187,11 +184,29 @@ sub top {
     return undef;
 }
 
+=head2 top_day
+
+C<< $vdm->top_day() >> returns the top of the day.
+
+=cut
+
+sub top_day {
+    my $self = shift;
+    my $page = shift;
+
+    my $t = $self->{twig};
+
+    my $xml = $self->run("view", "top_day", $page);
+    if (parse($xml, $t)) {
+        my @result = WWW::VieDeMerde::Message->parse($t);
+        return @result;
+    }
+    return undef;
+}
+
 =head2 top_jour
 
-C<< $vdm->top_jour() >> renvoie le top du jour.
-
-Accepte un numéro de page en argument.
+C<< $vdm->top_jour >> is an alias for C<< $vdm->top_day >>.
 
 =cut
 
@@ -199,9 +214,23 @@ sub top_jour {
     my $self = shift;
     my $page = shift;
 
+    return $self->top_day($page);
+}
+
+
+=head2 top_week
+
+C<< $vdm->top_week() >> return the week top.
+
+=cut
+
+sub top_week {
+    my $self = shift;
+    my $page = shift;
+
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", "top_jour", $page);
+    my $xml = $self->run("view", "top_week", $page);
     if (parse($xml, $t)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
@@ -211,9 +240,7 @@ sub top_jour {
 
 =head2 top_semaine
 
-C<< $vdm->top_semaine() >> renvoie le top de la semaine.
-
-Accepte un numéro de page en argument.
+C<< $vdm->top_semaine >> is an alias for C<< $vdm->top_week >>.
 
 =cut
 
@@ -221,21 +248,13 @@ sub top_semaine {
     my $self = shift;
     my $page = shift;
 
-    my $t = $self->{twig};
-
-    my $xml = $self->run("view", "top_semaine", $page);
-    if (parse($xml, $t)) {
-        my @result = WWW::VieDeMerde::Message->parse($t);
-        return @result;
-    }
-    return undef;
+    return $self->top_week($page);
 }
 
-=head2 top_mois
 
-C<< $vdm->top_mois() >> renvoie le top du mois.
+=head2 top_month
 
-Accepte un numéro de page en argument.
+C<< $vdm->top_month() >> returns the month top.
 
 =cut
 
@@ -253,11 +272,22 @@ sub top_mois {
     return undef;
 }
 
+=head2 top_mois
+
+C<< $vdm->top_mois >> is an alias for C<< $vdm->top_month >>.
+
+=cut
+
+sub top_month {
+    my $self = shift;
+    my $page = shift;
+
+    return $self->top_month($page);
+}
+
 =head2 flop
 
-C<< $vdm->flop() >> renvoie le flop global.
-
-Accepte un numéro de page en argument.
+C<< $vdm->flop() >> returns the global top.
 
 =cut
 
@@ -275,11 +305,29 @@ sub flop {
     return undef;
 }
 
+=head2 flop_day
+
+C<< $vdm->flop_day() >> returns day flop.
+
+=cut
+
+sub flop_day {
+    my $self = shift;
+    my $page = shift;
+
+    my $t = $self->{twig};
+
+    my $xml = $self->run("view", "flop_day", $page);
+    if (parse($xml, $t)) {
+        my @result = WWW::VieDeMerde::Message->parse($t);
+        return @result;
+    }
+    return undef;
+}
+
 =head2 flop_jour
 
-C<< $vdm->flop_jour() >> renvoie le flop du jour.
-
-Accepte un numéro de page en argument.
+C<< $vdm->flop_jour >> is an alias for C<< $vdm->top_day >>.
 
 =cut
 
@@ -287,9 +335,22 @@ sub flop_jour {
     my $self = shift;
     my $page = shift;
 
+    return $self->flop_day($page);
+}
+
+=head2 flop_week
+
+C<< $vdm->flop_week() >> returns week flop.
+
+=cut
+
+sub flop_week {
+    my $self = shift;
+    my $page = shift;
+
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", "flop_jour", $page);
+    my $xml = $self->run("view", "flop_week", $page);
     if (parse($xml, $t)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
@@ -299,9 +360,7 @@ sub flop_jour {
 
 =head2 flop_semaine
 
-C<< $vdm->flop_semaine() >> renvoie le flop de la semaine.
-
-Accepte un numéro de page en argument.
+C<< $vdm->flop_semaine >> is an alias for C<< $vdm->flop_semain >>.
 
 =cut
 
@@ -309,9 +368,22 @@ sub flop_semaine {
     my $self = shift;
     my $page = shift;
 
+    return $self->flop_week($page);
+}
+
+=head2 flop_month
+
+C<< $vdm->flop_month() >> returns month flop.
+
+=cut
+
+sub flop_month {
+    my $self = shift;
+    my $page = shift;
+
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", "flop_semaine", $page);
+    my $xml = $self->run("view", "flop_month", $page);
     if (parse($xml, $t)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
@@ -321,9 +393,7 @@ sub flop_semaine {
 
 =head2 flop_mois
 
-C<< $vdm->flop_mois() >> renvoie le flop du mois.
-
-Accepte un numéro de page en argument.
+C<< $vdm->flop_mois >> is an alias for C<< $vdm->flop_month >>.
 
 =cut
 
@@ -331,25 +401,37 @@ sub flop_mois {
     my $self = shift;
     my $page = shift;
 
-    my $t = $self->{twig};
-
-    my $xml = $self->run("view", "flop_mois", $page);
-    if (parse($xml, $t)) {
-        my @result = WWW::VieDeMerde::Message->parse($t);
-        return @result;
-    }
-    return undef;
+    return $self->flop_month($page);
 }
 
-=head2 cat
+=head2 categories
 
-C<< $vdm->cat($cat) >> renvoie les dernières entrées de la catégorie C<$cat>.
-
-Accepte un numéro de page en argument.
+C<< $vdm->categories($cat) >> returns a list for all categories.
 
 =cut
 
-sub cat {
+sub categories {
+    my $self = shift;
+
+    my $t = $self->{twig};
+
+    my $xml = $self->run("view", "categories");
+    warn "WWW::VieDeMerde->categories gives raw xml";
+    return $xml;
+    # if (parse($xml, $t)) {
+    #     my @result = WWW::VieDeMerde::Message->parse($t);
+    #     return @result;
+    # }
+    # return undef;
+}
+
+=head2 from_cat
+
+C<< $vdm->from_cat($cat) >> returns entries of the category $cat.
+
+=cut
+
+sub from_cat {
     my $self = shift;
     my $cat = shift;
     my $page = shift;
@@ -366,9 +448,10 @@ sub cat {
 
 =head1 INTERNAL METHODS AND FUNCTIONS
 
-Rien de de tout ceci n'est destiné aux utilisateurs !
 
 =head2 run
+
+Build the request by joining arguments with slashes.
 
 =cut
 
@@ -379,6 +462,7 @@ sub run {
     my $token = $self->{token};
     my $key = $self->{key};
     my $url = $self->{url};
+    my $lang = $self->{lang};
 
     my $ua = $self->{ua};
 
@@ -388,6 +472,9 @@ sub run {
     }
     if (defined $token) {
         $cmd .= "&token=$token";
+    }
+    if (defined $lang) {
+        $cmd .= "&language=$lang";
     }
 
     my $response = $ua->get($cmd);
@@ -402,6 +489,8 @@ sub run {
 }
 
 =head2 parse
+
+parse($xml, $t) is true if $xml is valid xml when parsed with parser $t.
 
 =cut
 
@@ -425,6 +514,8 @@ sub parse {
 
 =head2 errors
 
+Extract errors. Not implemented.
+
 =cut
 
 sub errors {
@@ -444,9 +535,6 @@ rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-VieDeMerde>. I will
 be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
-
-
-
 
 =head1 SUPPORT
 
