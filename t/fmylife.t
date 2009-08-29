@@ -22,7 +22,10 @@ is($fml->page(10000), 0, "nothing on page 100000");
 
 ############################################################
 # random
-BEGIN { $plan += 1; }
+BEGIN { $plan += 3; }
+my $g = $fml->get(4879906);
+ok($g->isa('WWW::VieDeMerde::Message'), "get returns an entry");
+is($g->id, 4879906, "get returns the good entry");
 my $r = $fml->random();
 ok($r->isa('WWW::VieDeMerde::Message'), "random returns an entry");
 
@@ -45,12 +48,8 @@ SKIP: {
 
 ############################################################
 # cat
-BEGIN { $plan += 6; }
-TODO: {
-    local $TODO = "Need to find the categories for fmylife.com";
-
-    for (qw/amour argent travail sante sexe inclassable/) {
-        is($fml->from_cat($_), 15, "cat($_) returns a list with 15 entries");
-    }
+BEGIN { $plan += 7; }
+for (qw/love money kids work health sex miscellaneous/) {
+    is($fml->from_cat($_), 15, "cat($_) returns a list with 15 entries");
 }
 

@@ -18,11 +18,11 @@ WWW::VieDeMerde - A perl module to use the viedemerde.fr API
 
 =head1 VERSION
 
-Version 0.031
+Version 0.1
 
 =cut
 
-our $VERSION = '0.031';
+our $VERSION = '0.1';
 
 =head1 SYNOPSIS
 
@@ -154,6 +154,26 @@ sub random {
     my $t = $self->{twig};
 
     my $xml = $self->run("view", "random");
+    if (parse($xml, $t)) {
+        my @l = WWW::VieDeMerde::Message->parse($t);
+        return $l[0];
+    }
+    return undef;
+}
+
+=head2 get
+
+C<< $vdm->get($id) >> return the item number $id.
+
+=cut
+
+sub get {
+    my $self = shift;
+    my $id = shift;
+    my $t = $self->{twig};
+
+    my $xml = $self->run("view", $id);
+
     if (parse($xml, $t)) {
         my @l = WWW::VieDeMerde::Message->parse($t);
         return $l[0];

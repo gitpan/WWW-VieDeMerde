@@ -21,8 +21,11 @@ is($vdm->page(3), 15, "page works with a page number");
 is($vdm->page(10000), 0, "nothing on page 100000");
 
 ############################################################
-# random
-BEGIN { $plan += 1; }
+# get, random
+BEGIN { $plan += 3; }
+my $g = $vdm->get(893417);
+ok($g->isa('WWW::VieDeMerde::Message'), "get returns an entry");
+is($g->id, 893417, "get returns the good entry");
 my $r = $vdm->random();
 ok($r->isa('WWW::VieDeMerde::Message'), "random returns an entry");
 

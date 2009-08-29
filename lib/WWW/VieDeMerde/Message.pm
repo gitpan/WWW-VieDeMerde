@@ -14,11 +14,11 @@ WWW::VieDeMerde::Message - A message from VieDeMerde.fr
 
 =head1 VERSION
 
-Version 0.031
+Version 0.1
 
 =cut
 
-our $VERSION = '0.031';
+our $VERSION = '0.1';
 
 =head1 SYNOPSIS
 
