@@ -4,11 +4,11 @@ use warnings;
 use strict;
 
 use Carp;
-
 use LWP::UserAgent;
 use XML::Twig;
 
 use WWW::VieDeMerde::Message;
+use WWW::VieDeMerde::Comment;
 
 =encoding utf8
 
@@ -18,11 +18,11 @@ WWW::VieDeMerde - A perl module to use the viedemerde.fr API
 
 =head1 VERSION
 
-Version 0.1
+Version 0.2
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 =head1 SYNOPSIS
 
@@ -32,6 +32,7 @@ our $VERSION = '0.1';
     my $tata = $toto->last();
     my $tata = $toto->page(17);
     my $tata = $toto->random();
+    my $tata = $toto->get(1234);
     
     print $tata->text, $tata->author;
 
@@ -80,9 +81,9 @@ sub new {
     my %params = @_;
 
     my %defaults = (
-        key => "readonly",
+        key => 'readonly',
         token => undef,
-        url => "http://api.betacie.com",
+        url => 'http://api.betacie.com',
         autoerrors => 0,
         lang => 'fr',
         );
@@ -121,9 +122,9 @@ sub page {
 
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", "last", $page);
+    my $xml = $self->_run('view', 'last', $page);
 
-    if (parse($xml, $t)) {
+    if (defined($xml)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
     }
@@ -153,8 +154,8 @@ sub random {
 
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", "random");
-    if (parse($xml, $t)) {
+    my $xml = $self->_run('view', 'random');
+    if (defined($xml)) {
         my @l = WWW::VieDeMerde::Message->parse($t);
         return $l[0];
     }
@@ -163,7 +164,7 @@ sub random {
 
 =head2 get
 
-C<< $vdm->get($id) >> return the item number $id.
+C<< $vdm->get($id) >> returns the item number $id.
 
 =cut
 
@@ -172,14 +173,33 @@ sub get {
     my $id = shift;
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", $id);
-
-    if (parse($xml, $t)) {
+    my $xml = $self->_run('view', $id, 'nocomment');
+    if (defined($xml)) {
         my @l = WWW::VieDeMerde::Message->parse($t);
         return $l[0];
     }
     return undef;
 }
+
+=head2 comments
+
+C<< $vdm->comments($id) >> returns the comments of the item $id.
+
+=cut
+
+sub comments {
+    my $self = shift;
+    my $id = shift;
+    my $t = $self->{twig};
+
+    my $xml = $self->_run('view', $id);
+    if (defined($xml)) {
+        my @l = WWW::VieDeMerde::Comment->parse($t);
+        return @l;
+    }
+    return undef;
+}
+
 
 =head2 top
 
@@ -196,8 +216,8 @@ sub top {
 
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", "top", $page);
-    if (parse($xml, $t)) {
+    my $xml = $self->_run('view', 'top', $page);
+    if (defined($xml)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
     }
@@ -216,8 +236,8 @@ sub top_day {
 
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", "top_day", $page);
-    if (parse($xml, $t)) {
+    my $xml = $self->_run('view', 'top_day', $page);
+    if (defined($xml)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
     }
@@ -250,8 +270,8 @@ sub top_week {
 
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", "top_week", $page);
-    if (parse($xml, $t)) {
+    my $xml = $self->_run('view', 'top_week', $page);
+    if (defined($xml)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
     }
@@ -284,8 +304,8 @@ sub top_mois {
 
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", "top_mois", $page);
-    if (parse($xml, $t)) {
+    my $xml = $self->_run('view', 'top_mois', $page);
+    if (defined($xml)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
     }
@@ -317,8 +337,8 @@ sub flop {
 
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", "flop", $page);
-    if (parse($xml, $t)) {
+    my $xml = $self->_run('view', 'flop', $page);
+    if (defined($xml)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
     }
@@ -337,8 +357,8 @@ sub flop_day {
 
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", "flop_day", $page);
-    if (parse($xml, $t)) {
+    my $xml = $self->_run('view', 'flop_day', $page);
+    if (defined($xml)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
     }
@@ -370,8 +390,8 @@ sub flop_week {
 
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", "flop_week", $page);
-    if (parse($xml, $t)) {
+    my $xml = $self->_run('view', 'flop_week', $page);
+    if (defined($xml)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
     }
@@ -403,8 +423,8 @@ sub flop_month {
 
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", "flop_month", $page);
-    if (parse($xml, $t)) {
+    my $xml = $self->_run('view', 'flop_month', $page);
+    if (defined($xml)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
     }
@@ -435,10 +455,10 @@ sub categories {
 
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", "categories");
-    warn "WWW::VieDeMerde->categories gives raw xml";
+    my $xml = $self->_run('view', 'categories');
+    warn 'WWW::VieDeMerde->categories gives raw xml';
     return $xml;
-    # if (parse($xml, $t)) {
+    # if (defined($xml)) {
     #     my @result = WWW::VieDeMerde::Message->parse($t);
     #     return @result;
     # }
@@ -458,24 +478,42 @@ sub from_cat {
 
     my $t = $self->{twig};
 
-    my $xml = $self->run("view", $cat, $page);
-    if (parse($xml, $t)) {
+    my $xml = $self->_run('view', $cat, $page);
+    if (defined($xml)) {
         my @result = WWW::VieDeMerde::Message->parse($t);
         return @result;
     }
     return undef;
 }
 
+=head2 errors
+
+Read/write accessor for errors.
+
+=cut
+
+sub errors {
+    my $self = shift;
+    my $e = shift;
+    if (defined $e) {
+        $self->{errors} = $e;
+        return;
+    }
+    else {
+        return $self->{errors}
+    }
+}
+
 =head1 INTERNAL METHODS AND FUNCTIONS
 
 
-=head2 run
+=head2 _run
 
 Build the request by joining arguments with slashes.
 
 =cut
 
-sub run {
+sub _run {
     my $self = shift;
     my @commands = grep {defined $_} @_;
 
@@ -485,63 +523,78 @@ sub run {
     my $lang = $self->{lang};
 
     my $ua = $self->{ua};
+    my $t = $self->{twig};
 
-    my $cmd = $url . "/" . join("/", @commands);
+    my $cmd = $url . '/' . join('/', @commands);
+    my $args = '';
     if (defined $key) {
-        $cmd .= "?key=$key";
+        $args .= '?key=' . $key;
     }
     if (defined $token) {
-        $cmd .= "&token=$token";
+        $args .= '&token=' . $token;
     }
     if (defined $lang) {
-        $cmd .= "&language=$lang";
+        $args .= '&language=' . $lang;
     }
 
-    my $response = $ua->get($cmd);
+    my $response = $ua->get($cmd . $args);
 
     if ($response->is_success) {
-        return $response->content;
+        my $xml = $response->content;
+        return undef if $self->_errors($xml) == 1;
+        return $xml;
     }
     else {
         carp $response->status_line;
+        $self->errors([$response->status_line]);
         return undef;
     }
 }
 
-=head2 parse
+=head2 _errors 
 
-parse($xml, $t) is true if $xml is valid xml when parsed with parser $t.
+Detect errors in an xml fragment returned by _run.
 
 =cut
 
-sub parse {
+sub _errors {
+    my $self = shift;
     my $xml = shift;
-    my $t = shift;
 
-    if (defined($xml)) {
-        if ($t->safe_parse($xml)) {
-            my $root = $t->root;
-            if ($root->tag eq "root") {
-                if ($root->first_child("code")->text == 1) {
-                    return 1;
-                }
-            }
+    my $t = $self->{twig};
+
+    if (defined($xml) and $t->safe_parse($xml)) {
+        my $root = $t->root;
+
+        my $errors = $root->first_child('errors');
+        my @errors = map {$_->text} $errors->children('error');
+        if (@errors) {
+            map {carp($_)} @errors;
+            $self->errors(\@errors);
+            return 1;
         }
+        
+        my $items = $root->first_child('items');
+        my @items = $items->children('item');
+        if (! @items) {
+            my $error = 'No item found';
+            carp $error;
+            $self->errors([$error]);
+                return 2;
+        }
+        return 0;
     }
-
-    return 0;
 }
 
-=head2 errors
+=head2 raw_xml
 
-Extract errors. Not implemented.
+Outputs raw xml for the given commands.
 
 =cut
 
-sub errors {
-    my $t = shift;
-
-    return undef;
+sub raw_xml {
+    my $self = shift;
+    return $self->_run(@_);
 }
 
 =head1 AUTHOR
@@ -589,6 +642,13 @@ L<http://search.cpan.org/dist/WWW-VieDeMerde>
 
 =back
 
+=head1 SEE ALSO
+
+L<WWW::FMyLife>
+
+In early development, it seems to intend to support votes and comments
+which is not my priority right now. Supports both French and English
+version, despite the name.
 
 =head1 COPYRIGHT & LICENSE
 

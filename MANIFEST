@@ -1,16 +1,20 @@
 Changes
 doc/documentation.html
 examples/categories.pl
+examples/comments.pl
+examples/dump.pl
+examples/fml.pl
 examples/last.pl
-examples/random-fml.pl
-examples/random-vdm.pl
+examples/vdm.pl
 lib/WWW/VieDeMerde.pm
+lib/WWW/VieDeMerde/Comment.pm
 lib/WWW/VieDeMerde/Message.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 README
 t/00-load.t
 t/boilerplate.t
+t/errors.t
 t/fmylife.t
 t/message.t
 t/new.t

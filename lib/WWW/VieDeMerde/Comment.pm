@@ -1,4 +1,4 @@
-package WWW::VieDeMerde::Message;
+package WWW::VieDeMerde::Comment;
 
 use warnings;
 use strict;
@@ -10,7 +10,7 @@ use XML::Twig;
 
 =head1 NAME
 
-WWW::VieDeMerde::Message - A message from VieDeMerde.fr
+WWW::VieDeMerde::Comment - A message from VieDeMerde.fr
 
 =head1 VERSION
 
@@ -25,15 +25,16 @@ our $VERSION = '0.2';
     use WWW::VieDeMerde;
     
     my $toto = WWW::VieDeMerde->new();
-    my $tata = $toto->get(1664);
-    
-    print $tata->text, $tata->author;
+    my @c = $toto->comments(1664);
+    foreach @c {
+       print $_->text, $_->author;
+    }
 
 =head1 DESCRIPTION
 
 You should first read the documentation L<WWW::VieDeMerde> !
 
-A WWW::VieDeMerde::Message object describes a fmylife or viedemerde item. You probably do not need to create yourself such object, L<WWW::VieDeMerde> manage it.
+A WWW::VieDeMerde::Comment object describes a fmylife or viedemerde comment. You probably do not need to create yourself such object, L<WWW::VieDeMerde> manage it.
 
 The following accessors are useful:
 
@@ -43,21 +44,9 @@ The following accessors are useful:
 
 =item * author
 
-=item * category
-
 =item * date
 
-=item * agree
-
-=item * deserved
-
-=item * comments
-
-It's the number of commentaries
-
 =item * text
-
-=item * comments_flag
 
 =back
 
@@ -65,7 +54,7 @@ It's the number of commentaries
 
 =head2 new
 
-Create a new WWW::VieDeMerde::Message given a vdm node the xml response to a query.
+Create a new WWW::VieDeMerde::Comment given a vdm node the xml response to a query.
 
 =cut
 
@@ -88,7 +77,7 @@ sub new {
 
 =head2 parse
 
-Take an xml tree and return a list of WWW::VieDeMerde::Message.
+Take an xml tree and return a list of WWW::VieDeMerde::Comment.
 qu'il contient.
 
 =cut
@@ -100,28 +89,24 @@ sub parse {
     my $t     = shift;
 
     my $root = $t->root;
-    my $vdms = $root->first_child('items');
+    my $vdms = $root->first_child('comments');
 
-    my @vdm = $vdms->children('item');
+    my @vdm = $vdms->children('comment');
 
     my @result = ();
 
     foreach (@vdm) {
-        my $m = WWW::VieDeMerde::Message->new($_);
+        my $m = WWW::VieDeMerde::Comment->new($_);
         push @result, $m;
-#        print $m->{auteur}, ", ";
     }
 
-# marche pas ?????
-#    return map(WWW::VieDeMerde::Message->new, @vdm);
     return @result;
 }
 
 # read-only accessors
-for my $attr (qw(id author category date agree deserved
-                 comments comments_flag text )) {
+for my $attr (qw(id author date text )) {
     no strict 'refs';
-    *{"WWW::VieDeMerde::Message::$attr"} = sub { $_[0]{$attr} }
+    *{"WWW::VieDeMerde::Comment::$attr"} = sub { $_[0]{$attr} }
 }
 
 =head1 AUTHOR

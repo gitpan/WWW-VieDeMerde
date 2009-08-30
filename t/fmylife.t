@@ -50,6 +50,6 @@ SKIP: {
 # cat
 BEGIN { $plan += 7; }
 for (qw/love money kids work health sex miscellaneous/) {
-    is($fml->from_cat($_), 15, "cat($_) returns a list with 15 entries");
+    is($fml->from_cat($_), 15, "from_cat($_) returns a list with 15 entries");
 }
 
