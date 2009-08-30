@@ -1,5 +1,14 @@
 Revision history for WWW-VieDeMerde
 
+0.21  Sun Aug 30 21:49 2009
+      Support comments
+		Error management
+
+0.1   Sat Aug 29 11:31 2009
+      support API 2.0 and fmylife.com
+      support get command
+
+
 0.02	Sun Nov 02 00:03:58 CEST 2008
 		Added random, top*, flop*, cat methods
 		Better function for calling API functions
